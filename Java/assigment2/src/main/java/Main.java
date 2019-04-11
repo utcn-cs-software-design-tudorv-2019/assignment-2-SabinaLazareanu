@@ -20,7 +20,7 @@ public class Main {
 		cliente.setICN("M");
 
 		// Save
-		//clienteService.save(cliente);
+		clienteService.save(cliente);
 
 		// Update
 		//cliente.setName("Teste Uptade Maria");
