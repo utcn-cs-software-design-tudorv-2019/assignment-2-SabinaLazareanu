@@ -5,48 +5,47 @@ import java.util.List;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 
-import com.assigment2.model.entities.Student;
+import com.assigment2.model.entities.Enrollement;
 
-public class StudentRepository {
-
+public class EnrollementRepository {
 	private SessionFactory sessionFactory;
 
-	public StudentRepository(SessionFactory sessionFactory) {
+	public EnrollementRepository(SessionFactory sessionFactory) {
 		this.sessionFactory = sessionFactory;
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<Student> getAll() throws DatabaseAccesException {
+	public List<Enrollement> getAll() throws DatabaseAccesException {
 		Session session = sessionFactory.openSession();
-		List<Student> students = null;
+		List<Enrollement> enrollements = null;
 		try {
 			session.beginTransaction();
-			students = session.createCriteria(Student.class).list();
+			enrollements = session.createCriteria(Enrollement.class).list();
 			session.getTransaction().commit();
 		} catch (Exception e) {
 			throw new DatabaseAccesException(e.getMessage());
 		} finally {
 			session.close();
 		}
-		return students;
+		return enrollements;
 	}
 
-	public Student getById(Integer id) throws DatabaseAccesException {
+	public Enrollement getById(Integer id) throws DatabaseAccesException {
 		Session session = sessionFactory.openSession();
-		Student element = null;
+		Enrollement enrollement = null;
 		try {
 			session.beginTransaction();
-			element = (Student) session.get(Student.class, id);
+			enrollement = (Enrollement) session.get(Enrollement.class, id);
 			session.getTransaction().commit();
 		} catch (Exception e) {
 			throw new DatabaseAccesException(e.getMessage());
 		} finally {
 			session.close();
 		}
-		return element;
+		return enrollement;
 	}
 
-	public Student save(Student object) throws DatabaseAccesException {
+	public Enrollement save(Enrollement object) throws DatabaseAccesException {
 		Session session = sessionFactory.openSession();
 		try {
 			session.beginTransaction();
@@ -60,7 +59,7 @@ public class StudentRepository {
 		return object;
 	}
 
-	public void update(Student object) throws DatabaseAccesException {
+	public void update(Enrollement object) throws DatabaseAccesException {
 		Session session = sessionFactory.openSession();
 		try {
 			session.beginTransaction();
@@ -73,7 +72,7 @@ public class StudentRepository {
 		}
 	}
 
-	public void delete(Student object) throws DatabaseAccesException {
+	public void delete(Enrollement object) throws DatabaseAccesException {
 		Session session = sessionFactory.openSession();
 		try {
 			session.beginTransaction();
@@ -85,5 +84,4 @@ public class StudentRepository {
 			session.close();
 		}
 	}
-
 }

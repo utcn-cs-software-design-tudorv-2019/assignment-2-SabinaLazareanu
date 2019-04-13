@@ -5,48 +5,47 @@ import java.util.List;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 
-import com.assigment2.model.entities.Student;
+import com.assigment2.model.entities.Course;
 
-public class StudentRepository {
-
+public class CourseRepository {
 	private SessionFactory sessionFactory;
 
-	public StudentRepository(SessionFactory sessionFactory) {
+	public CourseRepository(SessionFactory sessionFactory) {
 		this.sessionFactory = sessionFactory;
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<Student> getAll() throws DatabaseAccesException {
+	public List<Course> getAll() throws DatabaseAccesException {
 		Session session = sessionFactory.openSession();
-		List<Student> students = null;
+		List<Course> teachers = null;
 		try {
 			session.beginTransaction();
-			students = session.createCriteria(Student.class).list();
+			teachers = session.createCriteria(Course.class).list();
 			session.getTransaction().commit();
 		} catch (Exception e) {
 			throw new DatabaseAccesException(e.getMessage());
 		} finally {
 			session.close();
 		}
-		return students;
+		return teachers;
 	}
 
-	public Student getById(Integer id) throws DatabaseAccesException {
+	public Course getById(Integer id) throws DatabaseAccesException {
 		Session session = sessionFactory.openSession();
-		Student element = null;
+		Course course = null;
 		try {
 			session.beginTransaction();
-			element = (Student) session.get(Student.class, id);
+			course = (Course) session.get(Course.class, id);
 			session.getTransaction().commit();
 		} catch (Exception e) {
 			throw new DatabaseAccesException(e.getMessage());
 		} finally {
 			session.close();
 		}
-		return element;
+		return course;
 	}
 
-	public Student save(Student object) throws DatabaseAccesException {
+	public Course save(Course object) throws DatabaseAccesException {
 		Session session = sessionFactory.openSession();
 		try {
 			session.beginTransaction();
@@ -60,7 +59,7 @@ public class StudentRepository {
 		return object;
 	}
 
-	public void update(Student object) throws DatabaseAccesException {
+	public void update(Course object) throws DatabaseAccesException {
 		Session session = sessionFactory.openSession();
 		try {
 			session.beginTransaction();
@@ -73,7 +72,7 @@ public class StudentRepository {
 		}
 	}
 
-	public void delete(Student object) throws DatabaseAccesException {
+	public void delete(Course object) throws DatabaseAccesException {
 		Session session = sessionFactory.openSession();
 		try {
 			session.beginTransaction();
@@ -85,5 +84,4 @@ public class StudentRepository {
 			session.close();
 		}
 	}
-
 }

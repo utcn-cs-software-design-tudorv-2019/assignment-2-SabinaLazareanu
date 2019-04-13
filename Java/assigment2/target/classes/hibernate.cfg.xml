@@ -17,5 +17,9 @@
 
 		<!-- Mapping With Model Class Containing Annotations -->
 		<mapping class="com.assigment2.model.entities.User" />
+		<mapping class="com.assigment2.model.entities.Student" />
+		<mapping class="com.assigment2.model.entities.Teacher" />
+		<mapping class="com.assigment2.model.entities.Course" />
+		<mapping class="com.assigment2.model.entities.Enrollement" />
 	</session-factory>
 </hibernate-configuration>

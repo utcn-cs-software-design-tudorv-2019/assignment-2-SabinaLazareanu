@@ -5,34 +5,34 @@ import java.util.List;
 import org.hibernate.SessionFactory;
 
 import com.assigment2.model.entities.User;
-import com.assigment2.model.repositories.DatabaseException;
+import com.assigment2.model.repositories.DatabaseAccesException;
 import com.assigment2.model.repositories.UserRepository;
 
 public class UserService {
 
 	private UserRepository userRepo;
 
-	public UserService(SessionFactory sessionFactory) throws DatabaseException {
-		userRepo = new UserRepository(sessionFactory);
+	public UserService(UserRepository userRepo) {
+		this.userRepo = userRepo;
 	}
 
-	public User getByID(Integer id) throws DatabaseException {
+	public User getByID(Integer id) throws DatabaseAccesException {
 		return userRepo.getById(id);
 	}
 
-	public User save(User object) throws DatabaseException {
+	public User save(User object) throws DatabaseAccesException {
 		return userRepo.save(object);
 	}
 
-	public void update(User object) {
+	public void update(User object) throws DatabaseAccesException {
 		userRepo.update(object);
 	}
 
-	public void delete(User object) {
+	public void delete(User object) throws DatabaseAccesException {
 		userRepo.delete(object);
 	}
 
-	public List<User> getAll() throws DatabaseException {
+	public List<User> getAll() throws DatabaseAccesException {
 		return userRepo.getAll();
 	}
 

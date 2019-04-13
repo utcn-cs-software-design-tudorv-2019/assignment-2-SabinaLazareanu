@@ -1,39 +1,53 @@
 package com.assigment2.model.services;
 
 import java.util.List;
-
-import org.hibernate.SessionFactory;
+import java.util.concurrent.ExecutionException;
 
 import com.assigment2.model.entities.Student;
-import com.assigment2.model.repositories.DatabaseException;
+import com.assigment2.model.entities.User;
+import com.assigment2.model.repositories.DatabaseAccesException;
 import com.assigment2.model.repositories.StudentRepository;
 
 public class StudentService {
 
 	private StudentRepository studentRepo;
 
-	public StudentService(SessionFactory sessionFactory) throws DatabaseException {
-		studentRepo = new StudentRepository(sessionFactory);
+	public StudentService(StudentRepository studentRepo) {
+		this.studentRepo = studentRepo;
 	}
 
-	public Student getByID(Integer id) throws DatabaseException {
+	public Student getByID(Integer id) throws DatabaseAccesException {
 		return studentRepo.getById(id);
 	}
 
-	public Student save(Student object) throws DatabaseException {
+	public Student save(Student object) throws DatabaseAccesException {
 		return studentRepo.save(object);
 	}
 
-	public void update(Student object) {
+	public void update(Student object) throws DatabaseAccesException {
 		studentRepo.update(object);
 	}
 
-	public void delete(Student object) {
+	public void delete(Student object) throws DatabaseAccesException {
 		studentRepo.delete(object);
 	}
 
-	public List<Student> getAll() throws DatabaseException {
+	public List<Student> getAll() throws DatabaseAccesException {
 		return studentRepo.getAll();
+	}
+
+	public Student login(String userName, String password) throws DatabaseAccesException  {
+		Student currentUser = null;
+		List<Student> students = (List<Student>) studentRepo.getAll();
+		System.err.println(students.toString());
+		for (Student student : students) {
+			if (student.getUserName().equals(userName) && student.getPassword().equals(password)) {
+				currentUser=student;
+				break;
+			}
+		}
+
+		return currentUser;
 	}
 
 }

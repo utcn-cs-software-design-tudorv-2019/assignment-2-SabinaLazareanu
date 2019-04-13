@@ -1,10 +1,10 @@
 package com.assigment2.model.repositories;
 
-public class DatabaseException extends Exception {
+public class DatabaseAccesException extends Exception {
 
 	private static final long serialVersionUID = 1L;
 
-	public DatabaseException(String message) {
+	public DatabaseAccesException(String message) {
 		super(message);
 	}
 
