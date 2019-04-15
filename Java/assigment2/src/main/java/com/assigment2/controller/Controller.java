@@ -1,15 +1,31 @@
 package com.assigment2.controller;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 
 import com.assigment2.database.config.HibernateUtil;
+import com.assigment2.model.entities.Course;
+import com.assigment2.model.entities.Enrollement;
 import com.assigment2.model.entities.Student;
+import com.assigment2.model.entities.User;
+import com.assigment2.model.repositories.CourseRepository;
 import com.assigment2.model.repositories.DatabaseAccesException;
+import com.assigment2.model.repositories.EnrollementRepository;
 import com.assigment2.model.repositories.StudentRepository;
+import com.assigment2.model.repositories.TeacherRepository;
+import com.assigment2.model.repositories.UserRepository;
+import com.assigment2.model.services.CoursEnrollementEntity;
+import com.assigment2.model.services.CourseService;
+import com.assigment2.model.services.EnrollementService;
 import com.assigment2.model.services.StudentService;
+import com.assigment2.model.services.UserService;
+import com.mysql.cj.util.StringUtils;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -22,6 +38,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 
@@ -36,14 +53,15 @@ public class Controller {
 	private static Student currentStudent;
 
 	private StudentRepository studentRepo = new StudentRepository(HibernateUtil.getSessionFactory());
-//	// private TeacherRepository teacherRepo = new
-//	// TeacherRepository(HibernateUtil.getSessionFactory());
-//	private UserRepository userRepo = new UserRepository(HibernateUtil.getSessionFactory());
-//	// private EnrollementRepository enrolementRepo = new
-//	// EnrollementRepository(dbConnectionWrapper);
-//	// private CoursRepository coursRepo = new CoursRepository(dbConnectionWrapper);
-//	private UserService userService = new UserService(userRepo);
+	private TeacherRepository teacherRepo = new TeacherRepository(HibernateUtil.getSessionFactory());
+	private UserRepository userRepo = new UserRepository(HibernateUtil.getSessionFactory());
+	private EnrollementRepository enrolementRepo = new EnrollementRepository(HibernateUtil.getSessionFactory());
+	private CourseRepository courseRepo = new CourseRepository(HibernateUtil.getSessionFactory());
+
+	private UserService userService = new UserService(userRepo);
 	private StudentService studentService = new StudentService(studentRepo);
+	private EnrollementService enrollmentService = new EnrollementService(enrolementRepo);
+	private CourseService courseService = new CourseService(courseRepo);
 	private Alert alert = new Alert(AlertType.INFORMATION);
 
 	// Courses columns for students enrollments
@@ -260,70 +278,83 @@ public class Controller {
 	}
 
 	@FXML
-	private void enroleButton(ActionEvent event) throws ExecutionException {
-//		String selectedCours = comboBox.getValue();
-//		Cours cours = studentService.getSelectedCours(selectedCours);
-//		Enrollment enrollement = new Enrollment();
-//		enrollement.setStudent_id(((Student) currentStudent).getIdStudent());
-//		enrollement.setCours_id(cours.getIdCours());
-//		enrollement.setGrade(INITIAL_GRADE);
-//		studentService.addEnrollement(enrollement);
-//		refreshButton.fire();
-//		showInfoMessage("Enrollement with success!");
+	private void enroleButton(ActionEvent event) {
+		try {
+			String selectedCoursName = comboBox.getValue();
+			Course selectedCourse = courseService.getCourseByName(selectedCoursName);
+			Enrollement enrollement = new Enrollement();
+			enrollement.setStudent(studentService.getByID(currentStudent.getId()));
+			enrollement.setCourse(selectedCourse);
+			enrollement.setGrade(INITIAL_GRADE);
+			enrollmentService.save(enrollement);
+		} catch (DatabaseAccesException e) {
+			showInfoMessage(e.getMessage());
+		}
+		// refreshButton.fire();
+		showInfoMessage("Enrollement with success!");
 	}
 
 	@FXML
 	private void register(ActionEvent event) {
-//		Student newUser = null;
-//		if (!(StringUtils.isEmptyOrWhitespaceOnly(nameRegister.getText())
-//				|| StringUtils.isEmptyOrWhitespaceOnly(addressRegister.getText())
-//				|| StringUtils.isEmptyOrWhitespaceOnly(pncRegister.getText())
-//				|| StringUtils.isEmptyOrWhitespaceOnly(icnRegister.getText())
-//				|| StringUtils.isEmptyOrWhitespaceOnly((groupRegister.getText()))
-//				|| StringUtils.isEmptyOrWhitespaceOnly(userNameRegister.getText())
-//				|| StringUtils.isEmptyOrWhitespaceOnly(passwordRegister.getText())
-//				|| StringUtils.isEmptyOrWhitespaceOnly(cPasswordRegister.getText()))) {
-//			newUser = new Student();
-//			newUser.setName(nameRegister.getText());
-//			newUser.setAddress(addressRegister.getText());
-//			newUser.setPNC(pncRegister.getText());
-//			newUser.setICN(icnRegister.getText());
-//			newUser.setGroup(groupRegister.getText());
-//			newUser.setUserName(userNameRegister.getText());
-//			newUser.setPassword(passwordRegister.getText());
-//			Validator validator = new Validator();
-//
-//			if (validator.validatePassword(passwordRegister.getText(), cPasswordRegister.getText())) {
-//				try {
-//					currentStudent = studentService.addUser(newUser);
-//					Stage stage = (Stage) registerButtonRegister.getScene().getWindow();
-//					stage.close();
-//					studentPage();
-//				} catch (ExecutionException e) {
-//					showInfoMessage(e.getMessage());
-//				} catch (IOException e) {
-//					showInfoMessage(e.getMessage());
-//				}
-//			} else {
-//				registerMessage.setText("Confirmed password is incorrect!");
-//			}
-//		} else {
-//			showInfoMessage("Pease fill all the fields!");
-//		}
+		User user = null;
+		Student student = null;
+		Validator validator = null;
+		if (!(StringUtils.isEmptyOrWhitespaceOnly(nameRegister.getText())
+				|| StringUtils.isEmptyOrWhitespaceOnly(addressRegister.getText())
+				|| StringUtils.isEmptyOrWhitespaceOnly(pncRegister.getText())
+				|| StringUtils.isEmptyOrWhitespaceOnly(icnRegister.getText())
+				|| StringUtils.isEmptyOrWhitespaceOnly((groupRegister.getText()))
+				|| StringUtils.isEmptyOrWhitespaceOnly(userNameRegister.getText())
+				|| StringUtils.isEmptyOrWhitespaceOnly(passwordRegister.getText())
+				|| StringUtils.isEmptyOrWhitespaceOnly(cPasswordRegister.getText()))) {
+
+			user = new User();
+			student = new Student();
+			validator = new Validator();
+			if (validator.validatePassword(passwordRegister.getText(), cPasswordRegister.getText())) {
+				try {
+					user.setName(nameRegister.getText());
+					user.setAddress(addressRegister.getText());
+					user.setPNC(pncRegister.getText());
+					user.setICN(icnRegister.getText());
+					userService.save(user);
+
+					student.setUserName(userNameRegister.getText());
+					student.setPassword(passwordRegister.getText());
+					student.setGroupF(groupRegister.getText());
+					student.setUser(user);
+
+					currentStudent = studentService.save(student);
+					Stage stage = (Stage) registerButtonRegister.getScene().getWindow();
+					stage.close();
+					studentPage();
+
+				} catch (DatabaseAccesException e) {
+					showInfoMessage(e.getMessage());
+				} catch (IOException e) {
+					showInfoMessage(e.getMessage());
+				}
+			} else {
+				registerMessage.setText("Confirmed password is incorrect!");
+			}
+		} else {
+			showInfoMessage("Pease fill all the fields!");
+		}
 
 	}
 
 	@FXML
 	private void refresh(ActionEvent event) {
-//		Student student;
-//		try {
-//			student = (Student) studentService.getStudentWithId(((Student) currentStudent).getIdStudent());
-//			fillStudentFields(student);
-//			studentCoursesTable(((Student) currentStudent).getIdStudent(), tabelView);
-//			comboBox();
-//		} catch (ExecutionException e) {
-//			showInfoMessage(e.getMessage());
-//		}
+		Student student;
+		try {
+			student = studentService.getByID(currentStudent.getId());
+			fillStudentFields(student);
+			studentCoursesTable(studentService.getByID(currentStudent.getId()).getId(), tabelView);
+			System.err.println(studentService.getByID(currentStudent.getId()).getEnrollement().toString());
+			//comboBox();
+		} catch (ExecutionException | DatabaseAccesException e) {
+			showInfoMessage(e.getMessage());
+		}
 
 	}
 
@@ -429,25 +460,27 @@ public class Controller {
 
 	private void studentCoursesTable(Long idStudent, TableView table) throws ExecutionException {
 
-//		table.getColumns().clear();
-//		table.getColumns().addAll(coursColumn, teacherColumn, examColumn, gradeColumn);
-//		ObservableList<CoursEnrollementEntity> obs = FXCollections.observableArrayList();
-//		List<CoursEnrollementEntity> stuentEnrollments = null;
-//		try {
-//			stuentEnrollments = studentService.getStudentEnrollements(idStudent);
-//		} catch (ExecutionException e) {
-//			showInfoMessage(e.getMessage());
-//		}
-//		for (CoursEnrollementEntity studentEnroll : stuentEnrollments) {
-//			obs.add(studentEnroll);
-//		}
-//
-//		coursColumn.setCellValueFactory(new PropertyValueFactory<CoursEnrollementEntity, String>("cours"));
-//		teacherColumn.setCellValueFactory(new PropertyValueFactory<CoursEnrollementEntity, String>("teacher"));
-//		examColumn.setCellValueFactory(new PropertyValueFactory<CoursEnrollementEntity, String>("examDate"));
-//		gradeColumn.setCellValueFactory(new PropertyValueFactory<CoursEnrollementEntity, String>("grade"));
-//
-//		table.setItems(obs);
+		table.getColumns().clear();
+		table.getColumns().addAll(coursColumn, teacherColumn, examColumn, gradeColumn);
+		ObservableList<CoursEnrollementEntity> obs = FXCollections.observableArrayList();
+		List<Enrollement> stuentEnrollments = null;
+		try {
+			stuentEnrollments = enrollmentService.getStudentEnrollements(idStudent);
+		} catch (DatabaseAccesException e) {
+			showInfoMessage(e.getMessage());
+		}
+		for (Enrollement studentEnroll : stuentEnrollments) {
+			obs.add(new CoursEnrollementEntity(studentEnroll.getCourse().getCourseName(),
+					studentEnroll.getCourse().getTeacher().getUser().getName(),
+					studentEnroll.getCourse().getExamDate().toString(), studentEnroll.getGrade() + ""));
+		}
+
+		coursColumn.setCellValueFactory(new PropertyValueFactory<CoursEnrollementEntity, String>("cours"));
+		teacherColumn.setCellValueFactory(new PropertyValueFactory<CoursEnrollementEntity, String>("teacher"));
+		examColumn.setCellValueFactory(new PropertyValueFactory<CoursEnrollementEntity, String>("examDate"));
+		gradeColumn.setCellValueFactory(new PropertyValueFactory<CoursEnrollementEntity, String>("grade"));
+
+		table.setItems(obs);
 	}
 
 	private void studentsTableTeacherPage() throws ExecutionException {
@@ -473,22 +506,39 @@ public class Controller {
 	}
 
 	private void comboBox() throws ExecutionException {
-//		ArrayList<Cours> courses = new ArrayList<>();
-//		courses = studentService.getPossibleOptionsForCoursForStudent(((Student) currentStudent).getIdStudent());
-//		ObservableList<String> data = FXCollections.observableArrayList();
-//		for (Cours cours : courses) {
-//			data.add(cours.getCoursName());
-//		}
-//		comboBox.setItems(data);
+		try {
+			List<Course> courses = new ArrayList<>();
+			// For updating currentUserInfo, I will reUplode student info from database
+			//System.err.println(currentStudent.getEnrollement());
+			Student uploadedStudent = studentService.getByID(currentStudent.getId());
+			//System.err.println(uploadedStudent.getEnrollement());
+			List<Enrollement> enrollementsOfCurrentStudent = uploadedStudent.getEnrollement();
+
+			List<Course> takenCourses = new ArrayList<Course>();
+			if (Objects.nonNull(enrollementsOfCurrentStudent)) {
+				for (Enrollement enrollement : enrollementsOfCurrentStudent) {
+					takenCourses.add(enrollement.getCourse());
+				}
+			}
+			courses = courseService.getPossibleOptionsForCoursForStudent(takenCourses);
+			ObservableList<String> data = FXCollections.observableArrayList();
+			for (Course cours : courses) {
+				data.add(cours.getCourseName());
+			}
+			comboBox.setItems(data);
+		} catch (DatabaseAccesException e) {
+			showInfoMessage(e.getMessage());
+		}
+
 	}
 
-	private void fillStudentFields(Student user) {
-//		this.nameField.setText(user.getName());
-//		this.addressField.setText(user.getAddress());
-//		this.pncField.setText(user.getPNC());
-//		this.icnField.setText(user.getICN());
-//		this.idField.setText("" + user.getIdStudent());
-//		this.groupField.setText(user.getGroup());
+	private void fillStudentFields(Student student) {
+		this.nameField.setText(student.getUser().getName());
+		this.addressField.setText(student.getUser().getAddress());
+		this.pncField.setText(student.getUser().getPNC());
+		this.icnField.setText(student.getUser().getICN());
+		this.idField.setText("" + student.getId());
+		this.groupField.setText(student.getGroupF());
 	}
 
 	private void registerPage() throws IOException {

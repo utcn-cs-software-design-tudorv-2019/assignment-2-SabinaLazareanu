@@ -16,6 +16,7 @@ public class EnrollementRepository {
 
 	@SuppressWarnings("unchecked")
 	public List<Enrollement> getAll() throws DatabaseAccesException {
+		//TODO here is the problem
 		Session session = sessionFactory.openSession();
 		List<Enrollement> enrollements = null;
 		try {

@@ -2,8 +2,6 @@ package com.assigment2.model.services;
 
 import java.util.List;
 
-import org.hibernate.SessionFactory;
-
 import com.assigment2.model.entities.User;
 import com.assigment2.model.repositories.DatabaseAccesException;
 import com.assigment2.model.repositories.UserRepository;

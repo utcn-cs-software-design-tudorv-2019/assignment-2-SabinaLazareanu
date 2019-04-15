@@ -1,10 +1,8 @@
 package com.assigment2.model.services;
 
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 import com.assigment2.model.entities.Student;
-import com.assigment2.model.entities.User;
 import com.assigment2.model.repositories.DatabaseAccesException;
 import com.assigment2.model.repositories.StudentRepository;
 
@@ -16,7 +14,7 @@ public class StudentService {
 		this.studentRepo = studentRepo;
 	}
 
-	public Student getByID(Integer id) throws DatabaseAccesException {
+	public Student getByID(Long id) throws DatabaseAccesException {
 		return studentRepo.getById(id);
 	}
 
@@ -36,18 +34,18 @@ public class StudentService {
 		return studentRepo.getAll();
 	}
 
-	public Student login(String userName, String password) throws DatabaseAccesException  {
+	public Student login(String userName, String password) throws DatabaseAccesException {
 		Student currentUser = null;
 		List<Student> students = (List<Student>) studentRepo.getAll();
-		System.err.println(students.toString());
 		for (Student student : students) {
 			if (student.getUserName().equals(userName) && student.getPassword().equals(password)) {
-				currentUser=student;
+				currentUser = student;
 				break;
 			}
 		}
 
 		return currentUser;
 	}
+
 
 }

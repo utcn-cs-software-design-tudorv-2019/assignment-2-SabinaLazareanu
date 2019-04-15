@@ -24,6 +24,7 @@ public class User implements Serializable {
 	private String address;
 	private String pnc;
 	private String icn;
+
 	@OneToOne(mappedBy = "user", fetch = FetchType.EAGER)
 	private Student student;
 
@@ -36,6 +37,14 @@ public class User implements Serializable {
 
 	public void setStudent(Student student) {
 		this.student = student;
+	}
+
+	public Teacher getTeacher() {
+		return teacher;
+	}
+
+	public void setTeacher(Teacher teacher) {
+		this.teacher = teacher;
 	}
 
 	public Long getId() {

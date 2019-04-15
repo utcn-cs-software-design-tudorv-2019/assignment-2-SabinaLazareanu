@@ -5,7 +5,6 @@ import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -32,11 +31,11 @@ public class Student implements Serializable {
 	private String groupF;
 
 	@OneToOne
-	@JoinColumn(name = "user_id")
+	@JoinColumn(name = "user")
 	private User user;
 
 	@LazyCollection(LazyCollectionOption.FALSE)
-	@OneToMany(mappedBy = "student", fetch = FetchType.EAGER)
+	@OneToMany(mappedBy = "student")
 	private List<Enrollement> enrollement;
 
 	public List<Enrollement> getEnrollement() {
@@ -91,7 +90,7 @@ public class Student implements Serializable {
 	public String toString() {
 		System.out.println(super.toString());
 		return "Student [idStudent=" + id + ", userName=" + userName + ", password=" + password + ", group=" + groupF
-				+ ", user_idUser=";
+				+ "User=" + user;
 	}
 
 }

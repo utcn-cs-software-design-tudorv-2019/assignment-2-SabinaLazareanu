@@ -31,7 +31,7 @@ public class StudentRepository {
 		return students;
 	}
 
-	public Student getById(Integer id) throws DatabaseAccesException {
+	public Student getById(Long id) throws DatabaseAccesException {
 		Session session = sessionFactory.openSession();
 		Student element = null;
 		try {

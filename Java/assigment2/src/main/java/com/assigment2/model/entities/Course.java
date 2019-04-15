@@ -5,7 +5,6 @@ import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -25,6 +24,7 @@ public class Course {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "id")
 	private Long id;
+	@Column(name = "course_name")
 	private String courseName;
 	private Date examDate;
 
@@ -33,8 +33,8 @@ public class Course {
 	private Teacher teacher;
 
 	@LazyCollection(LazyCollectionOption.FALSE)
-	@OneToMany(mappedBy = "course", fetch = FetchType.EAGER)
-	private List<Enrollement> enrollement;
+	@OneToMany(mappedBy = "course")
+	 private List<Enrollement> enrollement;
 
 	public List<Enrollement> getEnrollement() {
 		return enrollement;
@@ -83,7 +83,7 @@ public class Course {
 		result = prime * result + ((courseName == null) ? 0 : courseName.hashCode());
 		result = prime * result + ((examDate == null) ? 0 : examDate.hashCode());
 		result = prime * result + ((id == null) ? 0 : id.hashCode());
-		result = prime * result + ((teacher == null) ? 0 : teacher.hashCode());
+//		result = prime * result + ((teacher == null) ? 0 : teacher.hashCode());
 		return result;
 	}
 
@@ -111,18 +111,17 @@ public class Course {
 				return false;
 		} else if (!id.equals(other.id))
 			return false;
-		if (teacher == null) {
-			if (other.teacher != null)
-				return false;
-		} else if (!teacher.equals(other.teacher))
-			return false;
+//		if (teacher == null) {
+//			if (other.teacher != null)
+//				return false;
+//		} else if (!teacher.equals(other.teacher))
+//			return false;
 		return true;
 	}
 
 	@Override
 	public String toString() {
-		return "Cours [idCours=" + id + ", coursName=" + courseName + ", examDate=" + examDate + ", teacherId="
-				+ teacher + "]";
+		return "Cours [idCours=" + id + ", coursName=" + courseName + ", examDate=" + examDate + ", teacherId=" + "]";
 	}
 
 }

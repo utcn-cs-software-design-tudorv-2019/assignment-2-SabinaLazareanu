@@ -1,7 +1,5 @@
 package com.assigment2.database.config;
 
-import java.util.Objects;
-
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -22,19 +20,7 @@ public class HibernateUtil {
 			StandardServiceRegistryBuilder builder = new StandardServiceRegistryBuilder()
 					.applySettings(configuration.getProperties());
 
-			if (Objects.isNull(configuration)) {
-				System.err.println("sunt null config");
-			} else {
-				System.err.println(" nu sunt null config");
-
-			}
 			ourSessionFactory = configuration.buildSessionFactory(builder.build());
-			if (Objects.isNull(ourSessionFactory)) {
-				System.err.println("sunt null our");
-			}else {
-				System.err.println(" nu sunt null our");
-
-			}
 		} catch (Throwable ex) {
 			throw new ExceptionInInitializerError(ex);
 		}

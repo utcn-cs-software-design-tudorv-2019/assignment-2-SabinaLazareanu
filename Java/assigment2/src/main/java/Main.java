@@ -1,7 +1,13 @@
 import com.assigment2.database.config.HibernateUtil;
+import com.assigment2.model.repositories.CourseRepository;
 import com.assigment2.model.repositories.DatabaseAccesException;
+import com.assigment2.model.repositories.EnrollementRepository;
 import com.assigment2.model.repositories.StudentRepository;
+import com.assigment2.model.repositories.TeacherRepository;
+import com.assigment2.model.services.CourseService;
+import com.assigment2.model.services.EnrollementService;
 import com.assigment2.model.services.StudentService;
+import com.assigment2.model.services.TeacherService;
 
 public class Main {
 	public static void main(String[] args) {
@@ -85,11 +91,40 @@ public class Main {
 
 		try {
 			System.err.println(student.getAll());
+			System.err.println(student.getByID(1l).getEnrollement());
 		} catch (DatabaseAccesException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-//		Service<Student> service = new Service(Student.class, HibernateUtil.getSessionFactory());
-//		System.err.println(service.getAll());
+
+		TeacherRepository teachertRepository = new TeacherRepository(HibernateUtil.getSessionFactory());
+		TeacherService teacher = new TeacherService(teachertRepository);
+
+		try {
+			System.err.println(teacher.getAll());
+		} catch (DatabaseAccesException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		CourseRepository courseRepository = new CourseRepository(HibernateUtil.getSessionFactory());
+		CourseService course = new CourseService(courseRepository);
+
+		try {
+			System.err.println(course.getAll());
+		} catch (DatabaseAccesException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		EnrollementRepository enrollementRepository = new EnrollementRepository(HibernateUtil.getSessionFactory());
+		EnrollementService enrollment = new EnrollementService(enrollementRepository);
+
+		try {
+			System.err.println(enrollment.getAll());
+		} catch (DatabaseAccesException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 }
