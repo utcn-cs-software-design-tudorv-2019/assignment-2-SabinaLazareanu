@@ -3,7 +3,9 @@ package com.assigment2.model.services;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.assigment2.model.entities.Course;
 import com.assigment2.model.entities.Enrollement;
+import com.assigment2.model.entities.Student;
 import com.assigment2.model.repositories.DatabaseAccesException;
 import com.assigment2.model.repositories.EnrollementRepository;
 
@@ -45,6 +47,23 @@ public class EnrollementService {
 			}
 		}
 		return studentEnrollements;
+	}
+
+	public void unenrollStudent(Enrollement selectedEnrollment) throws DatabaseAccesException {
+		Enrollement enrollement = getEnrollementByStudentAndCourse(selectedEnrollment.getStudent(),
+				selectedEnrollment.getCourse());
+		enrollementRepo.delete(enrollement);
+	}
+
+	public Enrollement getEnrollementByStudentAndCourse(Student student, Course coures) throws DatabaseAccesException {
+		List<Enrollement> enrollements = getAll();
+		for (Enrollement enrollement : enrollements) {
+			if (coures.getIdCours().equals(enrollement.getCourse().getIdCours())
+					&& student.getId().equals(enrollement.getStudent().getId())) {
+				return enrollement;
+			}
+		}
+		return null;
 	}
 
 }

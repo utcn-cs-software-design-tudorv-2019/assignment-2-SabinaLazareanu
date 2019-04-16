@@ -22,6 +22,7 @@ import com.assigment2.model.services.CourseService;
 import com.assigment2.model.services.EnrollementService;
 import com.assigment2.model.services.StudentService;
 import com.assigment2.model.services.UserService;
+import com.assigment2.model.services.UserStudent;
 import com.mysql.cj.util.StringUtils;
 
 import javafx.collections.FXCollections;
@@ -39,6 +40,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 
@@ -166,115 +168,127 @@ public class Controller {
 	private Button unrollButtonTeacher;
 
 	@FXML
-	private TableView<Student> studentsTable;
+	private TableView<UserStudent> studentsTable;
 
 	@FXML
 	private void unenrollStudent(ActionEvent event) {
-//		try {
-//			if (Objects.nonNull(getSelectedCours())) {
-//				Cours selectedCours = studentService.getSelectedCours(getSelectedCours().getCours());
-//				Enrollment enrollment = new EnrollementBuilder().setIdStudent(getSelectedStudent().getIdStudent())
-//						.setIdCours(selectedCours.getIdCours()).build();
-//				studentService.unenrollStudent(enrollment);
-//				showInfoMessage("Unenrollment with success!");
-//			} else {
-//				showInfoMessage("Please select a cours from right table!");
-//			}
-//		} catch (
-//
-//		ExecutionException e) {
-//			showInfoMessage(e.getMessage());
-//		}
+		try {
+			CoursEnrollementEntity selectedCourse = getSelectedCours();
+			if (Objects.nonNull(selectedCourse)) {
+				Course selectedCours = courseService.getCourseByName(selectedCourse.getCours());
+				Enrollement enrollment = new Enrollement();
+				enrollment.setStudent(getSelectedStudent());
+				enrollment.setCourse(selectedCours);
+				enrollmentService.unenrollStudent(enrollment);
+				showInfoMessage("Unenrollment with success!");
+			} else {
+				showInfoMessage("Please select a cours from right table!");
+			}
+		} catch (DatabaseAccesException e) {
+			showInfoMessage(e.getMessage());
+		}
 	}
 
 	@FXML
 	private void getGrade(ActionEvent event) {
-//		CoursEnrollementEntity selectedGrade = getSelectedCours();
-//		if (Objects.nonNull(selectedGrade)) {
-//			newGradeField.setText(selectedGrade.getGrade());
-//		} else {
-//			showInfoMessage("Please select a Cours first from right table!");
-//		}
+		CoursEnrollementEntity selectedGrade = getSelectedCours();
+		if (Objects.nonNull(selectedGrade)) {
+			newGradeField.setText(selectedGrade.getGrade());
+		} else {
+			showInfoMessage("Please select a Cours first from right table!");
+		}
 	}
 
 	@FXML
 	private void getGroup(ActionEvent event) {
-		if (Objects.nonNull(getSelectedStudent())) {
-			newGroupField.setText(getSelectedStudent().getGroupF());
-		} else {
-			showInfoMessage("Please select a student first from left table!");
+		try {
+			if (Objects.nonNull(getSelectedStudent())) {
+				newGroupField.setText(getSelectedStudent().getGroupF());
+			} else {
+				showInfoMessage("Please select a student first from left table!");
+			}
+		} catch (DatabaseAccesException e) {
+			showInfoMessage(e.getMessage());
 		}
 	}
 
 	@FXML
 	private void updateStudentInfoByTeacher(ActionEvent event) {
 
-//		try {
-//			if (Objects.isNull(getSelectedCours())) {
-//				studentService.updateStudentGroup(getSelectedStudent().getIdStudent(), newGroupField.getText());
-//				showInfoMessage("Group updated with success!");
-//			} else {
-//				Cours selectedCours = studentService.getSelectedCours(getSelectedCours().getCours());
-//				if (StringUtils.isEmptyOrWhitespaceOnly(newGroupField.getText())) {
-//					studentService.updateGrade(getSelectedStudent().getIdStudent(), selectedCours.getIdCours(),
-//							Float.parseFloat(newGradeField.getText()));
-//					showInfoMessage("Grade updated with success!");
-//				} else if (StringUtils.isEmptyOrWhitespaceOnly(newGradeField.getText())) {
-//					studentService.updateStudentGroup(getSelectedStudent().getIdStudent(), newGroupField.getText());
-//					showInfoMessage("Group updated with success!");
-//				} else {
-//					studentService.updateGrade(getSelectedStudent().getIdStudent(), selectedCours.getIdCours(),
-//							Float.parseFloat(newGradeField.getText()));
-//					studentService.updateStudentGroup(getSelectedStudent().getIdStudent(), newGroupField.getText());
-//					showInfoMessage("Group and grade updated with success!");
-//				}
-//			}
-//		} catch (NumberFormatException |
-//
-//				ExecutionException e) {
-//			showInfoMessage(e.getMessage());
-//		}
+		try {
+			if (Objects.isNull(getSelectedCours())) {
+				Student updatedstudent = getSelectedStudent();
+				updatedstudent.setGroupF(newGroupField.getText());
+				studentService.update(updatedstudent);
+				showInfoMessage("Group updated with success!");
+			} else {
+				Course selectedCourse = courseService.getCourseByName(getSelectedCours().getCours());
+				if (StringUtils.isEmptyOrWhitespaceOnly(newGroupField.getText())) {
+					Enrollement updatedEnrollement = enrollmentService.getEnrollementByStudentAndCourse(getSelectedStudent(), selectedCourse);
+					updatedEnrollement.setGrade(Float.parseFloat(newGradeField.getText()));
+					System.err.println(updatedEnrollement);
+					enrollmentService.update(updatedEnrollement);
+					showInfoMessage("Grade updated with success!");
+				} else if (StringUtils.isEmptyOrWhitespaceOnly(newGradeField.getText())) {
+					Student updatedstudent = getSelectedStudent();
+					updatedstudent.setGroupF(newGroupField.getText());
+					studentService.update(updatedstudent);
+					showInfoMessage("Group updated with success!");
+				} else {
+					Student updatedstudent = getSelectedStudent();
+					updatedstudent.setGroupF(newGroupField.getText());
+					showInfoMessage("Group updated with success!");
+					Enrollement updatedEnrollement = new Enrollement();
+					updatedEnrollement.setCourse(selectedCourse);
+					updatedEnrollement.setStudent(getSelectedStudent());
+					updatedEnrollement.setGrade(Float.parseFloat(newGradeField.getText()));
+					enrollmentService.update(updatedEnrollement);
+					showInfoMessage("Group and grade updated with success!");
+				}
+			}
+		} catch (NumberFormatException | DatabaseAccesException e) {
+			showInfoMessage(e.getMessage());
+		}
 
 	}
 
 	@FXML
 	private void deleteStudentByTeacher(ActionEvent event) {
-//		try {
-//			studentService.deleteAcount(getSelectedStudent());
-//			showInfoMessage("Student acount deleted with success!");
-//		} catch (ExecutionException e) {
-//			showInfoMessage(e.getMessage());
-//		}
+		try {
+			deleteAccount(getSelectedStudent());
+			showInfoMessage("Student acount deleted with success!");
+		} catch (DatabaseAccesException e) {
+			showInfoMessage(e.getMessage());
+		}
 	}
 
 	@FXML
 	private void getStudentEnrollements(ActionEvent event) {
-//		Student student = getSelectedStudent();
-//		if (Objects.nonNull(student)) {
-//			System.out.println(student.getIdStudent());
-//			try {
-//
-//				enrollementsTable.setEditable(true);
-//				gradeColumn.setCellFactory(TextFieldTableCell.forTableColumn());
-//				studentGroupColumn.setCellFactory(TextFieldTableCell.forTableColumn());
-//
-//				studentCoursesTable(student.getIdStudent(), enrollementsTable);
-//			} catch (ExecutionException e) {
-//				showInfoMessage(e.getMessage());
-//			}
-//		} else {
-//			showInfoMessage("Please select a student from table!");
-//		}
+		Student student;
+		try {
+			student = getSelectedStudent();
+			if (Objects.nonNull(student)) {
+				enrollementsTable.setEditable(true);
+				gradeColumn.setCellFactory(TextFieldTableCell.forTableColumn());
+				studentGroupColumn.setCellFactory(TextFieldTableCell.forTableColumn());
+
+				studentCoursesTable(student.getId(), enrollementsTable);
+			} else {
+				showInfoMessage("Please select a student from table!");
+			}
+		} catch (DatabaseAccesException e) {
+			showInfoMessage(e.getMessage());
+		}
 	}
 
 	@FXML
 	private void refreshTeacherPage(ActionEvent event) {
-//		try {
-//			studentsTableTeacherPage();
-//			enrollementsTable.getColumns().clear();
-//		} catch (ExecutionException e) {
-//			showInfoMessage(e.getMessage());
-//		}
+		try {
+			studentsTableTeacherPage();
+			enrollementsTable.getColumns().clear();
+		} catch (ExecutionException e) {
+			showInfoMessage(e.getMessage());
+		}
 	}
 
 	@FXML
@@ -290,7 +304,7 @@ public class Controller {
 		} catch (DatabaseAccesException e) {
 			showInfoMessage(e.getMessage());
 		}
-		// refreshButton.fire();
+		refreshButton.fire();
 		showInfoMessage("Enrollement with success!");
 	}
 
@@ -360,32 +374,24 @@ public class Controller {
 
 	@FXML
 	private void updateStudentButtonClicked(ActionEvent event) {
-//		try {
-//			Student studentToBeUpdated = updateCurrentUserInfo();
-//			if (Objects.nonNull(studentToBeUpdated)) {
-//				studentService.updateStudent(studentToBeUpdated);
-//				refreshButton.fire();
-//				showInfoMessage("Update with succes!");
-//			} else {
-//
-//				showInfoMessage("Please fill all the fields!");
-//			}
-//		} catch (ExecutionException e) {
-//			showInfoMessage(e.getMessage());
-//		}
+		try {
+			Student studentToBeUpdated = updateCurrentUserInfo();
+			if (Objects.nonNull(studentToBeUpdated)) {
+				studentService.update(studentToBeUpdated);
+				userService.update(studentToBeUpdated.getUser());
+				refreshButton.fire();
+				showInfoMessage("Update with succes!");
+			} else {
+
+				showInfoMessage("Please fill all the fields!");
+			}
+		} catch (DatabaseAccesException e) {
+			showInfoMessage(e.getMessage());
+		}
 	}
 
 	@FXML
 	private void loginButtonClicked(ActionEvent event) {
-//		
-//		Stage stage = (Stage) loginButton.getScene().getWindow();
-//		stage.close();
-//		try {
-//			studentPage();
-//		} catch (IOException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
 		checkUser = userName.getText().toString();
 		checkPassword = password.getText().toString();
 		try {
@@ -435,31 +441,26 @@ public class Controller {
 		}
 	}
 
-	private Student updateCurrentUserInfo() {
-//		Student updatedStudent = null;
-//		if (!(StringUtils.isEmptyOrWhitespaceOnly(groupField.getText())
-//				|| StringUtils.isEmptyOrWhitespaceOnly(nameField.getText())
-//				|| StringUtils.isEmptyOrWhitespaceOnly(addressField.getText())
-//				|| StringUtils.isEmptyOrWhitespaceOnly(pncField.getText())
-//				|| StringUtils.isEmptyOrWhitespaceOnly((icnField.getText())))) {
-//
-//			updatedStudent = new StudentBuilder().setGroup(groupField.getText()).build();
-//			updatedStudent.setIdStudent(((Student) currentStudent).getIdStudent());
-//			updatedStudent._setIdUser(((Student) currentStudent)._getIdUser());
-//			updatedStudent.setUserName(((Student) currentStudent).getUserName());
-//			updatedStudent.setPassword(((Student) currentStudent).getPassword());
-//			updatedStudent.setIdUser(currentStudent.getIdUser());
-//			updatedStudent.setName(nameField.getText());
-//			updatedStudent.setAddress(addressField.getText());
-//			updatedStudent.setPNC(pncField.getText());
-//			updatedStudent.setICN(icnField.getText());
-//		}
-//		return updatedStudent;
-		return null;
+	private Student updateCurrentUserInfo() throws DatabaseAccesException {
+		Student updatedStudent = null;
+		if (!(StringUtils.isEmptyOrWhitespaceOnly(groupField.getText())
+				|| StringUtils.isEmptyOrWhitespaceOnly(nameField.getText())
+				|| StringUtils.isEmptyOrWhitespaceOnly(addressField.getText())
+				|| StringUtils.isEmptyOrWhitespaceOnly(pncField.getText())
+				|| StringUtils.isEmptyOrWhitespaceOnly((icnField.getText())))) {
+
+			updatedStudent = studentService.getByID(currentStudent.getId());
+			updatedStudent.setGroupF(groupField.getText());
+			updatedStudent.getUser().setName(nameField.getText());
+			updatedStudent.getUser().setAddress(addressField.getText());
+			updatedStudent.getUser().setPNC(pncField.getText());
+			updatedStudent.getUser().setICN(icnField.getText());
+		}
+		return updatedStudent;
 
 	}
 
-	private void studentCoursesTable(Long idStudent, TableView table) throws ExecutionException {
+	private void studentCoursesTable(Long idStudent, TableView table) {
 
 		table.getColumns().clear();
 		table.getColumns().addAll(coursColumn, teacherColumn, examColumn, gradeColumn);
@@ -486,33 +487,34 @@ public class Controller {
 
 	private void studentsTableTeacherPage() throws ExecutionException {
 
-//		studentsTable.getColumns().clear();
-//		studentsTable.getColumns().addAll(studentIdColumn, studentNameColumn, studentGroupColumn);
-//		ObservableList<Student> obs = FXCollections.observableArrayList();
-//		List<Student> students = null;
-//		try {
-//			students = studentService.getAllStudents();
-//		} catch (ExecutionException e) {
-//			showInfoMessage(e.getMessage());
-//		}
-//		for (Student student : students) {
-//			obs.add(student);
-//		}
-//
-//		studentIdColumn.setCellValueFactory(new PropertyValueFactory<Student, String>("idStudent"));
-//		studentNameColumn.setCellValueFactory(new PropertyValueFactory<Student, String>("name"));
-//		studentGroupColumn.setCellValueFactory(new PropertyValueFactory<Student, String>("group"));
-//
-//		studentsTable.setItems(obs);
+		studentsTable.getColumns().clear();
+		studentsTable.getColumns().addAll(studentIdColumn, studentNameColumn, studentGroupColumn);
+		ObservableList<UserStudent> obs = FXCollections.observableArrayList();
+		UserStudent userStudent = null;
+		List<Student> students = null;
+		try {
+			students = studentService.getAll();
+		} catch (DatabaseAccesException e) {
+			showInfoMessage(e.getMessage());
+		}
+		for (Student student : students) {
+			userStudent = new UserStudent(student.getId(), student.getUser().getName(), student.getUser().getAddress(),
+					student.getUser().getPNC(), student.getUser().getICN(), student.getUserName(),
+					student.getPassword(), student.getGroupF());
+			obs.add(userStudent);
+		}
+
+		studentIdColumn.setCellValueFactory(new PropertyValueFactory<UserStudent, String>("id"));
+		studentNameColumn.setCellValueFactory(new PropertyValueFactory<UserStudent, String>("name"));
+		studentGroupColumn.setCellValueFactory(new PropertyValueFactory<UserStudent, String>("groupF"));
+
+		studentsTable.setItems(obs);
 	}
 
 	private void comboBox() throws ExecutionException {
 		try {
 			List<Course> courses = new ArrayList<>();
-			// For updating currentUserInfo, I will reUplode student info from database
-			// System.err.println(currentStudent.getEnrollement());
 			Student uploadedStudent = studentService.getByID(currentStudent.getId());
-			// System.err.println(uploadedStudent.getEnrollement());
 			List<Enrollement> enrollementsOfCurrentStudent = uploadedStudent.getEnrollement();
 
 			List<Course> takenCourses = new ArrayList<Course>();
@@ -574,8 +576,9 @@ public class Controller {
 		alert.showAndWait();
 	}
 
-	private Student getSelectedStudent() {
-		return (Student) studentsTable.getSelectionModel().getSelectedItem();
+	private Student getSelectedStudent() throws DatabaseAccesException {
+		UserStudent userStudent = studentsTable.getSelectionModel().getSelectedItem();
+		return studentService.getByID(userStudent.getId());
 	}
 
 	public void deleteAccount(Student student) throws DatabaseAccesException {
@@ -589,8 +592,8 @@ public class Controller {
 		userService.delete(student.getUser());
 	}
 
-//	private CoursEnrollementEntity getSelectedCours() {
-//		return (CoursEnrollementEntity) enrollementsTable.getSelectionModel().getSelectedItem();
-//	}
+	private CoursEnrollementEntity getSelectedCours() {
+		return (CoursEnrollementEntity) enrollementsTable.getSelectionModel().getSelectedItem();
+	}
 
 }
