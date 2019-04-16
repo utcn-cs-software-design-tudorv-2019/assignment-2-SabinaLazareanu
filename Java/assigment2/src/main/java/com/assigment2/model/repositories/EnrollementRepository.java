@@ -16,19 +16,15 @@ public class EnrollementRepository {
 
 	@SuppressWarnings("unchecked")
 	public List<Enrollement> getAll() throws DatabaseAccesException {
-		//TODO here is the problem
-		Session session = sessionFactory.openSession();
 		List<Enrollement> enrollements = null;
 		try {
-			session.beginTransaction();
-			enrollements = session.createCriteria(Enrollement.class).list();
-			session.getTransaction().commit();
+			enrollements = sessionFactory.openSession().createCriteria(Enrollement.class).list();
+			System.err.println(enrollements.toString());
 		} catch (Exception e) {
 			throw new DatabaseAccesException(e.getMessage());
-		} finally {
-			session.close();
 		}
 		return enrollements;
+
 	}
 
 	public Enrollement getById(Integer id) throws DatabaseAccesException {

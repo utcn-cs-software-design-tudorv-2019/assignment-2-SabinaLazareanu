@@ -351,7 +351,7 @@ public class Controller {
 			fillStudentFields(student);
 			studentCoursesTable(studentService.getByID(currentStudent.getId()).getId(), tabelView);
 			System.err.println(studentService.getByID(currentStudent.getId()).getEnrollement().toString());
-			//comboBox();
+			comboBox();
 		} catch (ExecutionException | DatabaseAccesException e) {
 			showInfoMessage(e.getMessage());
 		}
@@ -414,13 +414,14 @@ public class Controller {
 
 	@FXML
 	private void deleteAcount(ActionEvent event) {
-//		try {
-//			studentService.deleteAcount(currentStudent);
-//			Stage stage = (Stage) deleteButton.getScene().getWindow();
-//			stage.close();
-//		} catch (ExecutionException e) {
-//			showInfoMessage(e.getMessage());
-//		}
+		try {
+			Student updatedStudent = studentService.getByID(currentStudent.getId());
+			deleteAccount(updatedStudent);
+			Stage stage = (Stage) deleteButton.getScene().getWindow();
+			stage.close();
+		} catch (DatabaseAccesException e) {
+			showInfoMessage(e.getMessage());
+		}
 	}
 
 	@FXML
@@ -509,9 +510,9 @@ public class Controller {
 		try {
 			List<Course> courses = new ArrayList<>();
 			// For updating currentUserInfo, I will reUplode student info from database
-			//System.err.println(currentStudent.getEnrollement());
+			// System.err.println(currentStudent.getEnrollement());
 			Student uploadedStudent = studentService.getByID(currentStudent.getId());
-			//System.err.println(uploadedStudent.getEnrollement());
+			// System.err.println(uploadedStudent.getEnrollement());
 			List<Enrollement> enrollementsOfCurrentStudent = uploadedStudent.getEnrollement();
 
 			List<Course> takenCourses = new ArrayList<Course>();
@@ -575,6 +576,17 @@ public class Controller {
 
 	private Student getSelectedStudent() {
 		return (Student) studentsTable.getSelectionModel().getSelectedItem();
+	}
+
+	public void deleteAccount(Student student) throws DatabaseAccesException {
+		List<Enrollement> studentEnrollements = student.getEnrollement();
+		for (Enrollement enrollement : studentEnrollements) {
+			System.err.println(enrollement.toString());
+			enrollmentService.delete(enrollement);
+		}
+
+		studentService.delete(student);
+		userService.delete(student.getUser());
 	}
 
 //	private CoursEnrollementEntity getSelectedCours() {

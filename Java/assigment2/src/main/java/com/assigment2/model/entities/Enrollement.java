@@ -1,6 +1,9 @@
 package com.assigment2.model.entities;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -10,6 +13,11 @@ import javax.persistence.Table;
 @Table(name = "enrollement")
 public class Enrollement {
 
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "id")
+	private Long id;
+
 	@ManyToOne
 	@JoinColumn(name = "student")
 	private Student student;
@@ -18,8 +26,15 @@ public class Enrollement {
 	@JoinColumn(name = "course")
 	private Course course;
 
-	@Id
 	private float grade;
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
 
 	public Student getStudent() {
 		return student;
