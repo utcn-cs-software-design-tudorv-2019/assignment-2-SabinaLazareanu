@@ -5,14 +5,14 @@ import java.util.List;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 
+import com.assigment2.database.config.HibernateUtil;
 import com.assigment2.model.entities.Student;
 
 public class StudentRepository {
 
-	private SessionFactory sessionFactory;
+	private SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
 
-	public StudentRepository(SessionFactory sessionFactory) {
-		this.sessionFactory = sessionFactory;
+	public StudentRepository() {
 	}
 
 	@SuppressWarnings("unchecked")

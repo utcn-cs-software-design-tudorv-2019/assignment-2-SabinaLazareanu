@@ -3,6 +3,8 @@ package com.assigment2.model.services;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
+
 import com.assigment2.model.entities.Course;
 import com.assigment2.model.entities.Enrollement;
 import com.assigment2.model.entities.Student;
@@ -13,6 +15,7 @@ public class EnrollementService {
 
 	private EnrollementRepository enrollementRepo;
 
+	@Inject
 	public EnrollementService(EnrollementRepository enrollementRepo) {
 		this.enrollementRepo = enrollementRepo;
 	}

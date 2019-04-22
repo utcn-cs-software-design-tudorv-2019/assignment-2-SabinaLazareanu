@@ -2,6 +2,8 @@ package com.assigment2.model.services;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
 import com.assigment2.model.entities.Student;
 import com.assigment2.model.repositories.DatabaseAccesException;
 import com.assigment2.model.repositories.StudentRepository;
@@ -10,6 +12,7 @@ public class StudentService {
 
 	private StudentRepository studentRepo;
 
+	@Inject
 	public StudentService(StudentRepository studentRepo) {
 		this.studentRepo = studentRepo;
 	}

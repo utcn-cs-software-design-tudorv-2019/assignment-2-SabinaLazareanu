@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 
-import com.assigment2.database.config.HibernateUtil;
 import com.assigment2.model.entities.Course;
 import com.assigment2.model.entities.Enrollement;
 import com.assigment2.model.entities.Student;
@@ -23,6 +22,8 @@ import com.assigment2.model.services.EnrollementService;
 import com.assigment2.model.services.StudentService;
 import com.assigment2.model.services.UserService;
 import com.assigment2.model.services.UserStudent;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
 import com.mysql.cj.util.StringUtils;
 
 import javafx.collections.FXCollections;
@@ -54,16 +55,12 @@ public class Controller {
 	private String checkPassword;
 	private static Student currentStudent;
 
-	private StudentRepository studentRepo = new StudentRepository(HibernateUtil.getSessionFactory());
-	private TeacherRepository teacherRepo = new TeacherRepository(HibernateUtil.getSessionFactory());
-	private UserRepository userRepo = new UserRepository(HibernateUtil.getSessionFactory());
-	private EnrollementRepository enrolementRepo = new EnrollementRepository(HibernateUtil.getSessionFactory());
-	private CourseRepository courseRepo = new CourseRepository(HibernateUtil.getSessionFactory());
+	Injector injector = Guice.createInjector(new com.assigment2.model.Guice());
 
-	private UserService userService = new UserService(userRepo);
-	private StudentService studentService = new StudentService(studentRepo);
-	private EnrollementService enrollmentService = new EnrollementService(enrolementRepo);
-	private CourseService courseService = new CourseService(courseRepo);
+	private UserService userService = injector.getInstance(UserService.class);
+	private StudentService studentService = injector.getInstance(StudentService.class);
+	private EnrollementService enrollmentService = injector.getInstance(EnrollementService.class);
+	private CourseService courseService = injector.getInstance(CourseService.class);
 	private Alert alert = new Alert(AlertType.INFORMATION);
 
 	// Courses columns for students enrollments
@@ -224,7 +221,8 @@ public class Controller {
 			} else {
 				Course selectedCourse = courseService.getCourseByName(getSelectedCours().getCours());
 				if (StringUtils.isEmptyOrWhitespaceOnly(newGroupField.getText())) {
-					Enrollement updatedEnrollement = enrollmentService.getEnrollementByStudentAndCourse(getSelectedStudent(), selectedCourse);
+					Enrollement updatedEnrollement = enrollmentService
+							.getEnrollementByStudentAndCourse(getSelectedStudent(), selectedCourse);
 					updatedEnrollement.setGrade(Float.parseFloat(newGradeField.getText()));
 					System.err.println(updatedEnrollement);
 					enrollmentService.update(updatedEnrollement);
@@ -237,7 +235,6 @@ public class Controller {
 				} else {
 					Student updatedstudent = getSelectedStudent();
 					updatedstudent.setGroupF(newGroupField.getText());
-					showInfoMessage("Group updated with success!");
 					Enrollement updatedEnrollement = new Enrollement();
 					updatedEnrollement.setCourse(selectedCourse);
 					updatedEnrollement.setStudent(getSelectedStudent());

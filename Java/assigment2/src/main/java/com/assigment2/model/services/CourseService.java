@@ -3,6 +3,8 @@ package com.assigment2.model.services;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
+
 import com.assigment2.model.entities.Course;
 import com.assigment2.model.repositories.CourseRepository;
 import com.assigment2.model.repositories.DatabaseAccesException;
@@ -11,6 +13,7 @@ public class CourseService {
 
 	private CourseRepository courseRepo;
 
+	@Inject
 	public CourseService(CourseRepository courseRepo) {
 		this.courseRepo = courseRepo;
 	}
